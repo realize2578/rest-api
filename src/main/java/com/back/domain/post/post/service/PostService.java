@@ -26,6 +26,11 @@ public class PostService {
         return post;
     }
 
+
+    public void flush() {
+        postRepository.flush();
+    }
+
     public void deleteById(int id) {
         postRepository.deleteById(id);
     }

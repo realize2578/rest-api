@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.jmx.ParentAwareNamingStrategy;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +19,6 @@ import java.util.List;
 public class ApiV1PostController {
 
     private final PostService postService;
-    private final ParentAwareNamingStrategy parentAwareNamingStrategy;
 
     @GetMapping
     public List<PostDto> list() {
@@ -62,7 +60,7 @@ public class ApiV1PostController {
         long postsCount = postService.count();
 
         return new RsData<>(
-                "%d번 글이 성공적으로 작성되었습니다.".formatted(post.getId()),
+                "%d번 게시물이 성공적으로 작성되었습니다.".formatted(post.getId()),
                 "201-1",
                 new PostWriteResBody(
                         new PostDto(post),
@@ -98,7 +96,7 @@ public class ApiV1PostController {
         Post post = postService.modify(id, reqBody.title, reqBody.content);
 
         return new RsData<>(
-                "%d번 글이 성공적으로 수정되었습니다.".formatted(post.getId()),
+                "%d번 게시물이 성공적으로 수정되었습니다.".formatted(post.getId()),
                 "200-1",
                 new PostModifyResBody(
                         new PostDto(post)
@@ -116,7 +114,7 @@ public class ApiV1PostController {
         postService.deleteById(id);
 
         return new RsData<>(
-                "%d번 글이 삭제되었습니다.".formatted(id),
+                "%d번 게시물이 삭제되었습니다.".formatted(id),
                 "200-1"
         );
     }
