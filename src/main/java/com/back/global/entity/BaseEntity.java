@@ -1,6 +1,9 @@
 package com.back.global.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,14 +18,12 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createDate;
 
     @LastModifiedDate
-    @Column(name = "modified_at")
     private LocalDateTime modifyDate;
 
 }

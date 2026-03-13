@@ -3,6 +3,7 @@ package com.back.domain.post.comment.controller;
 import com.back.domain.post.comment.dto.CommentDto;
 import com.back.domain.post.comment.entity.Comment;
 import com.back.domain.post.post.entity.Post;
+import com.back.domain.post.post.repository.PostRepository;
 import com.back.domain.post.post.service.PostService;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
@@ -20,16 +21,16 @@ import java.util.List;
 public class ApiV1CommentController {
 
     private final PostService postService;
+    private final PostRepository postRepository;
 
     @GetMapping
-    @ResponseBody
     public List<CommentDto> list(
             @PathVariable int postId
     ) {
         Post post = postService.findById(postId).get();
         List<Comment> comments = post.getComments();
 
-        List<CommentDto> commentDtoList = comments.stream()
+        List<CommentDto> commentDtoList = comments.reversed().stream()
                 .map(CommentDto::new)
                 .toList();
 
@@ -37,13 +38,13 @@ public class ApiV1CommentController {
     }
 
     @GetMapping("/{commentId}")
-    @ResponseBody
     public CommentDto detail(@PathVariable int postId, @PathVariable int commentId) {
         Post post = postService.findById(postId).get();
         Comment comment = post.findCommentById(commentId).get();
 
         return new CommentDto(comment);
     }
+
 
     record CommentWriteReqBody(
             @NotBlank(message = "02-content-내용은 필수입니다.")
@@ -70,7 +71,7 @@ public class ApiV1CommentController {
         postService.flush();
 
         return new RsData<>(
-                "%d번 댓글이 성공적으로 작성되었습니다.".formatted(comment.getId()),
+                "%d번 댓글이 생성되었습니다.".formatted(comment.getId()),
                 "201-1",
                 new CommentWriteResBody(
                         new CommentDto(comment)
@@ -78,9 +79,7 @@ public class ApiV1CommentController {
         );
     }
 
-
     @DeleteMapping("/{commentId}")
-    @ResponseBody
     @Transactional
     public RsData<CommentDto> delete(
             @PathVariable int postId,
@@ -90,11 +89,31 @@ public class ApiV1CommentController {
         Comment comment = post.findCommentById(commentId).get();
         post.deleteComment(commentId);
 
-        return new RsData(
+        return new RsData<>(
                 "%d번 댓글이 삭제되었습니다.".formatted(commentId),
-                "204-1",
+                "200-1",
                 new CommentDto(comment)
         );
     }
 
+    record CommentModifyReqBody(
+            String content
+    ){}
+
+    @PutMapping("/{commentId}")
+    @Transactional
+    public RsData<Void> modify(
+            @PathVariable int postId,
+            @PathVariable int commentId,
+            @RequestBody CommentModifyReqBody reqBody
+    ) {
+
+        Post post = postService.findById(postId).get();
+        post.modifyComment(commentId, reqBody.content);
+
+        return new RsData<>(
+                "%d번 댓글이 수정되었습니다.".formatted(1),
+                "200-1"
+        );
+    }
 }

@@ -24,7 +24,7 @@ public class ApiV1PostController {
     public List<PostDto> list() {
         List<Post> result = postService.findAll();
 
-        List<PostDto> postDtoList = result.stream()
+        List<PostDto> postDtoList = result.reversed().stream()
                 .map(PostDto::new)
                 .toList();
 
@@ -33,6 +33,7 @@ public class ApiV1PostController {
 
     @GetMapping("/{id}")
     public PostDto detail(@PathVariable int id) {
+
         Post post = postService.findById(id).get();
         return new PostDto(post);
     }
@@ -60,7 +61,7 @@ public class ApiV1PostController {
         long postsCount = postService.count();
 
         return new RsData<>(
-                "%d번 게시물이 성공적으로 작성되었습니다.".formatted(post.getId()),
+                "%d번 게시물이 생성되었습니다.".formatted(post.getId()),
                 "201-1",
                 new PostWriteResBody(
                         new PostDto(post),
@@ -87,7 +88,7 @@ public class ApiV1PostController {
     }
 
     @PutMapping("/{id}")
-    @Transactional //더티체킹
+    @Transactional
     public RsData<PostModifyResBody> modify(
             @PathVariable int id,
             @RequestBody @Valid PostModifyReqBody reqBody
@@ -96,15 +97,13 @@ public class ApiV1PostController {
         Post post = postService.modify(id, reqBody.title, reqBody.content);
 
         return new RsData<>(
-                "%d번 게시물이 성공적으로 수정되었습니다.".formatted(post.getId()),
+                "%d번 게시물이 수정되었습니다.".formatted(post.getId()),
                 "200-1",
                 new PostModifyResBody(
                         new PostDto(post)
                 )
         );
     }
-
-
 
     @DeleteMapping("/{id}")
     public RsData<Void> delete(
